@@ -1,5 +1,5 @@
 # C
 
-### the C language is one of the most fasts and powerfull programming language. 
+### C é uma das linguagens mais poderosas e rápidas que existe.
 
-#### Here some projects in this language.
+#### Aqui estão alguns projetos com essa linguagem, com finalidade a disciplina de Programação Estruturada do professor Yuri Malheiros.

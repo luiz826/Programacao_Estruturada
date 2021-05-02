@@ -3,11 +3,12 @@
 
 #include <stdio.h>
 
-void barras_verticais(int x[], int y[]) {
-	int aux, maior=0, contador=4; // pra usar na func maior
+int barras_verticais(int x[], int y[], int len_x, int len_y) {
+	int aux, maior=0, contador; 
+
 
 	// maior -> achar o maior valor do array
-	for (int k=0; k < 5; k++) {
+	for (int k=0; k < len_y; k++) {
 		if (y[k] > maior) {
 			maior = y[k];
 		}
@@ -15,16 +16,16 @@ void barras_verticais(int x[], int y[]) {
 
 
 	// criando um array pra ordena-lo
-	int y_sort[5];
+	int y_sort[len_y];
 
-	for (int j=0 ; j < 5; j++) {
+	for (int j=0 ; j < len_y; j++) {
 		y_sort[j] = y[j];	
 	}
 		
 
 	// algoritmo de sort
-	for (int c=0; c < 5; c++) {
-		for (int p=0; p < 5; p++) {
+	for (int c=0; c < len_y; c++) {
+		for (int p=0; p < len_y; p++) {
 			if (y_sort[p] > y_sort[p + 1]) {
                 aux = y_sort[p];
                 y_sort[p] = y_sort[p + 1];
@@ -33,11 +34,13 @@ void barras_verticais(int x[], int y[]) {
 		}
 	}
 
-
 	printf("\n");
+
 	// for para printar os quadradinhos e os labels do eixo y
+	contador = len_y-1;
+
 	for (int quadradinho=maior-1; quadradinho >= 0; quadradinho-- ) {
-		for (int espacos=0; espacos < 6; espacos++) {
+		for (int espacos=0; espacos < (len_y+1); espacos++) {
 			if (espacos == 0) {
 				if (y_sort[contador] == quadradinho+1) {
 					printf("%.2d |", y_sort[contador]);
@@ -58,83 +61,100 @@ void barras_verticais(int x[], int y[]) {
 
 
 	// for pra printar os labels do eixo x
-	printf("---|------------------------------------\n   |  ");
-	for (int i=0; i< 5 ; i++) {
+	for (int i=0; i < len_y ; i++) {
+		printf("--------");
+	}
+	printf("\n   |  ");
+	for (int i=0; i < len_y ; i++) {
 		printf("%d | ", x[i]);
 	}
 	printf("\n");
+
+	return 0;
 }
  
-void barras_horizontais(int x[], int y[]) {
-	int aux, maior=0; // pra usar na func maior
+int barras_horizontais(int x1[], int y1[], int len_x1, int len_y1) {
+	int aux, maior=0;
 
 	// maior -> achar o maior valor do array
-	for (int k=0; k < 5; k++) {
-		if (x[k] > maior) {
-			maior = x[k];
+	for (int k=0; k < len_x1; k++) {
+		if (x1[k] > maior) {
+			maior = x1[k];
 		}
 	}
 
 	printf("\n");
 
 	// for para printar os quadradinhos e os labels do eixo y
-	for (int j=0; j < 5; j++ ) {
+	for (int j=0; j < len_x1; j++ ) {
 		
-		printf("%d |  ",y[j]);
+		printf("%d |  ",y1[j]);
 
-		for (int quadradinho=0; quadradinho < (int) x[j]; quadradinho++) {
+		for (int quadradinho=0; quadradinho < (int) x1[j]; quadradinho++) {
 			printf("■ ");
 		}
 		printf("\n");
 	}
 
+	int x_sort[len_x1];
+
+	for (int j=0 ; j < len_x1; j++) {
+		x_sort[j] = x1[j];	
+	}
 
 	// algoritmo de sort
-	for (int c=0; c < 5; c++) {
-		for (int p=0; p < 5; p++) {
-			if (x[p] > x[p + 1]) {
-                aux = x[p];
-                x[p] = x[p + 1];
-                x[p + 1] = aux;
+	for (int c=0; c < len_x1; c++) {
+		for (int p=0; p < len_x1; p++) {
+			if (x_sort[p] > x_sort[p + 1]) {
+                aux = x_sort[p];
+                x_sort[p] = x_sort[p + 1];
+                x_sort[p + 1] = aux;
 			}	
 		}
 	}
 	
 	// printar os tracinhos do eixo X
-	printf("-----|------");
+	printf("------------");
 	for (int i=0; i < maior; i++) {
 		printf("--");
 	}
 
 
 	// printar os labels do eixo X
-	printf("\n     |  ");
-	for (int i=0; i < maior; i++) {
-		if (i+1 == x[0]) {
-			printf("%.2d", x[0]);		
-		} else if (i+1 == x[1]) {
-			printf("%.2d", x[1]);		
-		} else if (i+1 == x[2]) {
-			printf("%.2d", x[2]);		
-		} else if (i+1 == x[3]) {
-			printf("%.2d", x[3]);		
-		} else if (i+1 == x[4]) {
-			printf("%.2d", x[4]);		
-		} else {
-			printf("  ");
-		}
+	printf("\n     |");
 
+	int item = 0;
+
+	for (int i=0; i <= maior; i++) {
+		if (i == x_sort[item]) {
+			printf("%.2d", x_sort[item]);
+			
+			if (item < len_x1){
+				item++;
+			}
+
+		}else {
+			printf("  ");
+		}	
 	}
+	
 
 	printf("\n");
+
+	return 0;
 }
-	    
+	 
+
+
 int main(void){
 	int array_1[] = {2017, 2018, 2019, 2020, 2021}; // valores padrão
-	int array_2[] = {6, 4, 12, 10, 8}; // valores padrão
+	int array_2[] = {2, 4, 10, 6, 8}; // valores padrão
 
-	barras_verticais(array_1, array_2);
-	barras_horizontais(array_2, array_1);
+	int tam_1 = 5, tam_2 = 5; // tamanho dos arrays
+
+	barras_verticais(array_1, array_2, tam_1, tam_2); 
+
+	barras_horizontais(array_2, array_1, tam_2, tam_1);		
 	
 	return 0;
 }

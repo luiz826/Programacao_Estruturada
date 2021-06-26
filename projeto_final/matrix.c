@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 //#include "matrix.h"
 
 
@@ -28,6 +29,10 @@ struct matrix create_matrix(int *data, int n_rows, int n_cols) {
 	self.stride_cols = 1;
 	self.offset = 0;
 
+	// CAIO CHECANDO
+	//for (int i=0; i<(n_rows*n_cols); i++){
+	//	printf("%d ", data[i]);
+	//}
 	return self;
 }
 
@@ -41,6 +46,24 @@ struct matrix zero_matrix(int n_rows, int n_cols) {
 
 	
 	return create_matrix(ar, n_rows, n_cols);
+}
+
+
+struct matrix random_matrix(int n_rows, int n_cols, int b, int e){
+	int dim, quantidade = 0;
+	dim = (n_rows*n_cols);
+	int ram[dim];
+
+	srand(time(NULL));
+
+
+	quantidade = e - b + 1;
+
+	for (int i = 0; i<dim; i++){
+		ram[i] = (rand() % quantidade) + b;
+	}
+
+	return create_matrix(ram, n_rows, n_cols);
 }
 
 
@@ -77,7 +100,7 @@ void put_element(struct matrix a_matrix, int ri, int ci, int elem){
 	a_matrix.data[index] = elem;
 }
 
-
+// O print_matrix ta errado ou é o zero_matrix, i_matrix e random matrix?
 void print_matrix(struct matrix a_matrix){
 	int cont;
 
@@ -101,7 +124,52 @@ void print_matrix(struct matrix a_matrix){
 	}
 
 }
+/////////// Funções para manipulação de dimensões ///////////////////////////
 
+struct matrix transpose(struct matrix a_matrix){
+	int temp_n_cols, temp_n_rows, temp_stride_rows;
+
+	temp_n_cols = a_matrix.n_cols;
+	temp_n_rows = a_matrix.n_rows;
+	temp_stride_rows = a_matrix.stride_rows;
+
+	a_matrix.n_cols = temp_n_rows;
+	a_matrix.n_rows = temp_n_cols;
+	a_matrix.stride_rows = temp_n_cols;
+
+	// retorno a_matrix ou outro create_matrix?
+	return a_matrix;
+}
+
+struct matrix reshape(struct matrix a_matrix, int new_n_rows, int new_n_cols){
+	int quantidade_de_elementos = 0; 
+
+	for (int i = 0; i<(a_matrix.n_rows*a_matrix.n_cols); i++){
+		quantidade_de_elementos++;
+	}
+
+	if (quantidade_de_elementos == new_n_rows * new_n_cols){
+		a_matrix.n_rows = new_n_rows;
+		a_matrix.n_cols = new_n_cols;
+		a_matrix.stride_rows = new_n_rows;
+
+	} else{
+		printf("Impossível realizar o reshape. Insira uma quantidade de elementos válida.\n");
+		exit(1);
+	}
+
+	return a_matrix;
+
+}	
+
+struct matrix flatten(struct matrix a_matrix){
+
+	a_matrix.n_cols = a_matrix.n_cols * a_matrix.n_rows;
+	a_matrix.stride_rows = a_matrix.n_cols;  
+	a_matrix.n_rows = 1;
+
+	return a_matrix;
+}
 //////////////////// Funções de agregação ///////////////////////////
 
 
@@ -170,6 +238,7 @@ int max(struct matrix a_matrix){
 /////////////////////////////////////////////////////////////////////
 
 // FUNÇÃO MAIN PARA TESTAR O QUE TA DANDO ERRADO
+/*
 int main(void){
 ///////////////////////////TESTE1////////////////////////////////////
 
@@ -262,5 +331,15 @@ int main(void){
 	printf("\n");
 
 
+	return 0;
+}
+*/
+int main(void){
+	int array[6] = {1, 2, 3, 4, 5, 6};
+
+	//print_matrix((2, 3, 0, 3));
+	print_matrix(flatten(create_matrix(array, 2, 3)));
+
+	
 	return 0;
 }

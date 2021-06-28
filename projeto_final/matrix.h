@@ -1,3 +1,8 @@
+/* 
+	Aluno: Caio Lucas da Silva Chacon	  | Matricula: 20200025
+	Aluno: Luiz Fernando Costa dos Santos | Matricula: 20200025446
+*/
+
 struct matrix {
 	int *data;
 	int n_rows;
@@ -22,10 +27,9 @@ int sum(struct matrix a_matrix);
 int mean(struct matrix a_matrix);
 int min(struct matrix a_matrix);
 int max(struct matrix a_matrix);
-/*
 struct matrix add(struct matrix a_matrix, struct matrix b_matrix);
 struct matrix sub(struct matrix a_matrix, struct matrix b_matrix);
-struct matrix div(struct matrix a_matrix, struct matrix b_matrix);
+struct matrix division(struct matrix a_matrix, struct matrix b_matrix);
 struct matrix mul(struct matrix a_matrix, struct matrix b_matrix);
-struct matrix matmul(struct matrix a_matrix, struct matrix b_matrix);
-*/
+//struct matrix matmul(struct matrix a_matrix, struct matrix b_matrix);
+

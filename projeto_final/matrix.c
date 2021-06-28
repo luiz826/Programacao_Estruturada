@@ -1,6 +1,11 @@
+/* 
+	Aluno: Caio Lucas da Silva Chacon	  | Matricula: 20200025
+	Aluno: Luiz Fernando Costa dos Santos | Matricula: 20200025446
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <limits.h>
 #include <time.h>
 #include "matrix.h"
@@ -10,7 +15,7 @@
 struct matrix create_matrix(int *data, int n_rows, int n_cols) {
 	struct matrix self;
 
-	self.data = &data[0];
+	self.data = data;
 	self.n_rows = n_rows;
 	self.n_cols = n_cols;
 	self.stride_rows = n_cols;
@@ -22,22 +27,24 @@ struct matrix create_matrix(int *data, int n_rows, int n_cols) {
 
 
 struct matrix zeros_matrix(int n_rows, int n_cols) {
-	int dim;
-	dim = (n_rows*n_cols);
-	int ar[dim];
+	int dim = (n_rows*n_cols);
+	int *ar = malloc(dim * sizeof(int));
 
 
-	memset(ar, 0, dim*sizeof(ar[0]));
+	for (int i=0; i<dim; i++){
+		ar[i]= 0;
+	}
 
 	
-	return create_matrix(ar, n_rows, n_cols);
-}
+	struct matrix a_matrix = create_matrix(ar, n_rows, n_cols);
+	return a_matrix;
+}	
 
 
 struct matrix random_matrix(int n_rows, int n_cols, int b, int e){
 	int dim, quantidade = 0;
 	dim = (n_rows*n_cols);
-	int ram[dim];
+	int *ram = malloc(dim * sizeof(int));
 
 	srand(time(NULL));
 
@@ -48,22 +55,20 @@ struct matrix random_matrix(int n_rows, int n_cols, int b, int e){
 		ram[i] = (rand() % quantidade) + b;
 	}
 
-	return create_matrix(ram, n_rows, n_cols);
+	struct matrix a_matrix = create_matrix(ram, n_rows, n_cols);
+	return a_matrix;
 }
 
 
 struct matrix i_matrix(int n) {
-	int dim;
-	dim = n*n;
-	int ar[dim];
 
-	memset(ar, 0, dim*sizeof(ar[0]));
+	struct matrix a_matrix = zeros_matrix(n, n);
 
-	for (int i=0; i<dim; i = i+(n+1)){
-		ar[i] = 1;
+	for (int i=0; i<n*n; i = i+(n+1)){
+		a_matrix.data[i] = 1;
 	}
 
-	return create_matrix(ar, n, n);
+	return a_matrix;
 }
 
 ////////// Funções para acessar elementos ///////////////////////////
@@ -71,7 +76,7 @@ struct matrix i_matrix(int n) {
 int get_element(struct matrix a_matrix, int ri, int ci){
 	int index;
 
-	index = (ri*a_matrix.stride_rows) + (ci*a_matrix.stride_cols);
+	index = (ri*a_matrix.stride_cols) + (ci*a_matrix.stride_rows);
 
 	return a_matrix.data[index];
 }
@@ -80,7 +85,7 @@ int get_element(struct matrix a_matrix, int ri, int ci){
 void put_element(struct matrix a_matrix, int ri, int ci, int elem){
 	int index;
 
-	index = (ri*a_matrix.stride_rows) + (ci*a_matrix.stride_cols);
+	index = (ri*a_matrix.stride_cols) + (ci*a_matrix.stride_rows);
 
 	a_matrix.data[index] = elem;
 }
@@ -98,7 +103,7 @@ void print_matrix(struct matrix a_matrix){
 				printf("|");
 			}
 			
-			printf("%2.d ", a_matrix.data[cont]);
+			printf("%d ", a_matrix.data[cont]);
 			cont++;
 
 			if (j == a_matrix.n_cols-1){
@@ -117,6 +122,7 @@ struct matrix transpose(struct matrix a_matrix){
 	temp_n_cols = a_matrix.n_cols;
 	temp_n_rows = a_matrix.n_rows;
 	temp_stride_rows = a_matrix.stride_rows;
+
 
 	a_matrix.n_cols = temp_n_rows;
 	a_matrix.n_rows = temp_n_cols;
@@ -156,6 +162,7 @@ struct matrix flatten(struct matrix a_matrix){
 	return a_matrix;
 }
 
+// struct matrix slice(struct matrix a_matrix, int rs, int re, int cs, int ce){}
 
 //////////////////// Funções de agregação ///////////////////////////
 
@@ -219,3 +226,104 @@ int max(struct matrix a_matrix){
 }
 
 ////////////////////Funções de operações aritméticas//////////////////
+
+struct matrix add(struct matrix a_matrix, struct matrix b_matrix) {
+	int dim_a, dim_b;
+
+	dim_a = (a_matrix.n_cols*a_matrix.n_rows);
+	dim_b = (b_matrix.n_cols*b_matrix.n_rows);
+
+	if (dim_a != dim_b){
+		printf("Impossível realizar a soma. Insira uma quantidade de elementos válida.\n");
+		exit(1);
+	}
+
+	int *soma = malloc(dim_a * sizeof(int));
+
+	for (int i=0; i<dim_a; i++) {
+		soma[i] = a_matrix.data[i]+b_matrix.data[i];
+	}
+
+	struct matrix soma_matrix = create_matrix(soma, a_matrix.n_rows, a_matrix.n_cols);
+	return soma_matrix;
+}
+
+struct matrix sub(struct matrix a_matrix, struct matrix b_matrix){
+	int dim_a, dim_b;
+
+	dim_a = (a_matrix.n_cols*a_matrix.n_rows);
+	dim_b = (b_matrix.n_cols*b_matrix.n_rows);
+
+	if (dim_a != dim_b){
+		printf("Impossível realizar a subtração. Insira uma quantidade de elementos válida.\n");
+		exit(1);
+	}
+
+	int *subs = malloc(dim_a * sizeof(int));
+
+	for (int i=0; i<dim_a; i++) {
+		subs[i] = a_matrix.data[i]-b_matrix.data[i];
+	}
+
+	struct matrix subs_matrix = create_matrix(subs, a_matrix.n_rows, a_matrix.n_cols);
+	return subs_matrix;
+}
+
+struct matrix division(struct matrix a_matrix, struct matrix b_matrix) {
+	int dim_a, dim_b;
+
+	dim_a = (a_matrix.n_cols*a_matrix.n_rows);
+	dim_b = (b_matrix.n_cols*b_matrix.n_rows);
+
+	if (dim_a != dim_b){
+		printf("Impossível realizar a divisão. Insira uma quantidade de elementos válida.\n");
+		exit(1);
+	}
+
+	int *divi = malloc(dim_a * sizeof(int));
+
+	for (int i=0; i<dim_a; i++) {
+		if (b_matrix.data[i] == 0){
+			printf("Impossível realizar a divisão por 0. Insira uma quantidade de elementos válida.\n");
+			exit(1);
+		}
+
+		divi[i] = a_matrix.data[i]/b_matrix.data[i];
+	}
+
+	struct matrix divi_matrix = create_matrix(divi, a_matrix.n_rows, a_matrix.n_cols);
+	return divi_matrix;
+}
+
+struct matrix mul(struct matrix a_matrix, struct matrix b_matrix) {
+	int dim_a, dim_b;
+
+	dim_a = (a_matrix.n_cols*a_matrix.n_rows);
+	dim_b = (b_matrix.n_cols*b_matrix.n_rows);
+
+	if (dim_a != dim_b){
+		printf("Impossível realizar a multiplicação. Insira uma quantidade de elementos válida.\n");
+		exit(1);
+	}
+
+	int *mult = malloc(dim_a * sizeof(int));
+
+	for (int i=0; i<dim_a; i++) {
+		mult[i] = a_matrix.data[i]*b_matrix.data[i];
+
+	}
+
+	struct matrix mult_matrix = create_matrix(mult, a_matrix.n_rows, a_matrix.n_cols);
+	return mult_matrix;
+}
+
+/*
+struct matrix matmul(struct matrix a_matrix, struct matrix b_matrix){
+	if (a_matrix.n_cols != b_matrix.n_rows){
+		printf("Impossível realizar a multiplicação. Insira uma quantidade de elementos válida.\n");
+		exit(1);
+	}
+
+	// desenvolver...
+}
+*/

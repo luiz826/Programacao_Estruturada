@@ -3,44 +3,29 @@
 #include <string.h>
 #include <limits.h>
 #include <time.h>
-//#include "matrix.h"
-
-
-
-struct matrix {
-	int *data;
-	int n_rows;
-	int n_cols;
-	int stride_rows;
-	int stride_cols;
-	int offset;
-};
-
+#include "matrix.h"
 
 /////////////////// Funções para criação de matrizes /////////////////
 
 struct matrix create_matrix(int *data, int n_rows, int n_cols) {
 	struct matrix self;
 
-	self.data = data;
+	self.data = &data[0];
 	self.n_rows = n_rows;
 	self.n_cols = n_cols;
-	self.stride_rows = n_rows;
+	self.stride_rows = n_cols;
 	self.stride_cols = 1;
 	self.offset = 0;
 
-	// CAIO CHECANDO
-	//for (int i=0; i<(n_rows*n_cols); i++){
-	//	printf("%d ", data[i]);
-	//}
 	return self;
 }
 
 
-struct matrix zero_matrix(int n_rows, int n_cols) {
+struct matrix zeros_matrix(int n_rows, int n_cols) {
 	int dim;
 	dim = (n_rows*n_cols);
 	int ar[dim];
+
 
 	memset(ar, 0, dim*sizeof(ar[0]));
 
@@ -106,8 +91,8 @@ void print_matrix(struct matrix a_matrix){
 
 	cont = 0;
 
-	for (int i=0; i<a_matrix.n_rows; i++){
-		for (int j=0; j<a_matrix.n_cols; j++){
+	for (int i=a_matrix.offset; i<a_matrix.n_rows; i++){
+		for (int j=a_matrix.offset; j<a_matrix.n_cols; j++){
 			
 			if (j == 0) {
 				printf("|");
@@ -144,7 +129,7 @@ struct matrix transpose(struct matrix a_matrix){
 struct matrix reshape(struct matrix a_matrix, int new_n_rows, int new_n_cols){
 	int quantidade_de_elementos = 0; 
 
-	for (int i = 0; i<(a_matrix.n_rows*a_matrix.n_cols); i++){
+	for (int i = a_matrix.offset; i<(a_matrix.n_rows*a_matrix.n_cols); i++){
 		quantidade_de_elementos++;
 	}
 
@@ -170,6 +155,8 @@ struct matrix flatten(struct matrix a_matrix){
 
 	return a_matrix;
 }
+
+
 //////////////////// Funções de agregação ///////////////////////////
 
 
@@ -179,7 +166,7 @@ int sum(struct matrix a_matrix) {
 	dim = (a_matrix.n_cols*a_matrix.n_rows);
 
 	s = 0;
-	for (int i=0; i<dim; i++){
+	for (int i=a_matrix.offset; i<dim; i++){
 		s += a_matrix.data[i];
 	}
 
@@ -192,7 +179,7 @@ int mean(struct matrix a_matrix) {
 	dim = (a_matrix.n_cols*a_matrix.n_rows);
 
 	s = 0;
-	for (i=0; i<dim; i++){
+	for (i=a_matrix.offset; i<dim; i++){
 		s += a_matrix.data[i];
 	}
 
@@ -201,145 +188,34 @@ int mean(struct matrix a_matrix) {
 
 int min(struct matrix a_matrix){
 	int dim;
-	int min;
+	int mini;
 
 	dim = (a_matrix.n_cols*a_matrix.n_rows);
 
-	min = INT_MAX; 
-	for (int i=0; i<dim; i++){
-		if (min > a_matrix.data[i]){
-			min = a_matrix.data[i];
+	mini = INT_MAX; 
+	for (int i=a_matrix.offset; i<dim; i++){
+		if (mini > a_matrix.data[i]){
+			mini = a_matrix.data[i];
 		}
 	}
 
-	return min;
+	return mini;
 }
 
 int max(struct matrix a_matrix){
 	int dim;
-	int max;
+	int maxi;
 
 	dim = (a_matrix.n_cols*a_matrix.n_rows);
 
-	max = 0;
-	for (int i=0; i<dim; i++){
-		if (max < a_matrix.data[i]){
-			max = a_matrix.data[i];
+	maxi = 0;
+	for (int i=a_matrix.offset; i<dim; i++){
+		if (maxi < a_matrix.data[i]){
+			maxi = a_matrix.data[i];
 		}
 	}
 
-	return max;
+	return maxi;
 }
 
-
-
-/////////////////////////////////////////////////////////////////////
-////////////////////////////////MAIN/////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-
-// FUNÇÃO MAIN PARA TESTAR O QUE TA DANDO ERRADO
-/*
-int main(void){
-///////////////////////////TESTE1////////////////////////////////////
-
-	struct matrix a;
-	int array[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-
-	a = create_matrix(array, 3, 3);
-
-	for (int i=0; i<(a.n_rows*a.n_cols); i++){
-	  	printf("%d, ", a.data[i]);
-	}
-
-	printf("\n");
-	printf("%d\n", a.n_rows);
-	printf("%d\n", a.n_cols);
-	printf("%d\n", a.stride_rows);
-	printf("%d\n", a.stride_cols);
-	printf("%d\n", a.offset);
-	printf("\n");
-//////////////////////////TESTE2////////////////////////////////////
-
-	struct matrix b;	
-
-	b = zero_matrix(3, 3);
-
-	for (int i=0; i<(b.n_rows*b.n_cols); i++){
-	  	printf("%d, ", b.data[i]);
-	}
-
-	printf("\n");
-	printf("%d\n", b.n_rows);
-	printf("%d\n", b.n_cols);
-	printf("%d\n", b.stride_rows);
-	printf("%d\n", b.stride_cols);
-	printf("%d\n", b.offset);
-	printf("\n");
-//////////////////////////TESTE3////////////////////////////////////
-
-	struct matrix c;	
-
-	c = i_matrix(3);
-
-	for (int i=0; i<(c.n_rows*c.n_cols); i++){
-	  	printf("%d, ", c.data[i]);
-	}
-
-	printf("\n");
-	printf("%d\n", c.n_rows);
-	printf("%d\n", c.n_cols);
-	printf("%d\n", c.stride_rows);
-	printf("%d\n", c.stride_cols);
-	printf("%d\n", c.offset);
-	printf("\n");
-
-//////////////////////////TESTE4////////////////////////////////////
-
-	printf("\n");
-	printf("%d\n",  get_element(a, 1, 0));
-	printf("\n");
-	print_matrix(a);
-	printf("\n");
-	put_element(a, 1, 0, 99);
-	print_matrix(a);
-	printf("\n");
-//////////////////////////TESTE5////////////////////////////////////
-
-	printf("\n");
-	printf("%d\n",  sum(a));
-	printf("%d\n", mean(a));
-	printf("%d\n",  min(a));
-	printf("%d\n",  max(a));
-	printf("\n");
-
-
-	// se passar b no lugar de i_matrix, da errado
-	printf("\n");
-	printf("%d\n",  sum(zero_matrix(3,2)));
-	printf("%d\n", mean(zero_matrix(3,2)));
-	printf("%d\n",  min(zero_matrix(3,2)));
-	printf("%d\n",  max(zero_matrix(3,2)));
-	printf("\n");
-
-
-	// se passar c no lugar de i_matrix, da errado
-	printf("\n");
-	printf("%d\n",  sum(i_matrix(5))); 
-	printf("%d\n", mean(i_matrix(5)));
-	printf("%d\n",  min(i_matrix(5)));
-	printf("%d\n",  max(i_matrix(5)));
-	printf("\n");
-
-
-	return 0;
-}
-*/
-int main(void){
-	int array[6] = {1, 2, 3, 4, 5, 6};
-
-	//print_matrix((2, 3, 0, 3));
-	print_matrix(flatten(create_matrix(array, 2, 3)));
-
-	
-	return 0;
-}
+////////////////////Funções de operações aritméticas//////////////////

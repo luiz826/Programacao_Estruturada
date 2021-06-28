@@ -1,4 +1,4 @@
-# The final project:
+# O projeto final:
 
 O NumPy é uma das principais ferramentas para ciência de dados e base de
 diversas bibliotecas para linguagem Python. Um dos principais motivos para sua

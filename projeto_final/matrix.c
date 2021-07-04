@@ -1,5 +1,5 @@
 /* 
-	Aluno: Caio Lucas da Silva Chacon	  | Matricula: 20200025
+	Aluno: Caio Lucas da Silva Chacon	  | Matricula: 20200025769
 	Aluno: Luiz Fernando Costa dos Santos | Matricula: 20200025446
 */
 
@@ -74,14 +74,14 @@ struct matrix i_matrix(int n) {
 ////////// Funções para acessar elementos ///////////////////////////
 
 int get_element(struct matrix a_matrix, int ri, int ci){
-	int index = (ri*a_matrix.stride_cols) + (ci*a_matrix.stride_rows);
+	int index = (ri*a_matrix.stride_rows) + (ci*a_matrix.stride_cols);
 
 	return a_matrix.data[index];
 }
 
 
 void put_element(struct matrix a_matrix, int ri, int ci, int elem){
-	int index = (ri*a_matrix.stride_cols) + (ci*a_matrix.stride_rows);
+	int index = (ri*a_matrix.stride_rows) + (ci*a_matrix.stride_cols);
 
 	a_matrix.data[index] = elem;
 }
@@ -89,17 +89,18 @@ void put_element(struct matrix a_matrix, int ri, int ci, int elem){
 
 void print_matrix(struct matrix a_matrix){
 	// to debug
-	printf("nrows: %d\nncols: %d\nstrows: %d\nstcols: %d\n", a_matrix.n_rows, a_matrix.n_cols, a_matrix.stride_rows, a_matrix.stride_cols);
+	printf("nrows: %d\nncols: %d\nstrows: %d\nstcols: %d\noffset: %d\n", a_matrix.n_rows, a_matrix.n_cols, a_matrix.stride_rows, a_matrix.stride_cols, a_matrix.offset);
 
-	for (int i=a_matrix.offset; i<a_matrix.n_rows; i++){
-		for (int j=a_matrix.offset; j<a_matrix.n_cols; j++){
+
+	for (int i=0; i<a_matrix.n_rows; i++){
+		for (int j=0; j<a_matrix.n_cols; j++){
 			
 			if (j == 0) {
 				printf("|");
 			}
 			
-			printf(" %d ", a_matrix.data[(j*a_matrix.stride_cols) + (i*a_matrix.stride_rows)]);
-			
+			printf(" %d ", a_matrix.data[( (i*a_matrix.stride_rows) + (j*a_matrix.stride_cols) ) + a_matrix.offset]);
+
 			if (j == a_matrix.n_cols-1){
 				printf("|");	
 			}
@@ -153,7 +154,13 @@ struct matrix flatten(struct matrix a_matrix){
 	return a_matrix;
 }
 
-// struct matrix slice(struct matrix a_matrix, int rs, int re, int cs, int ce){}
+struct matrix slice(struct matrix a_matrix, int rs, int re, int cs, int ce) {
+	a_matrix.n_rows = re-rs;  
+	a_matrix.n_cols = ce-cs;
+	a_matrix.offset = rs*a_matrix.stride_rows+cs*a_matrix.stride_cols;
+
+	return a_matrix;
+}
 
 //////////////////// Funções de agregação ///////////////////////////
 
@@ -168,8 +175,8 @@ int sum(struct matrix a_matrix) {
 	return summ;
 }
 
-int mean(struct matrix a_matrix) {
-	int summ = 0, dim = (a_matrix.n_cols*a_matrix.n_rows);
+float mean(struct matrix a_matrix) {
+	float summ = 0, dim = (a_matrix.n_cols*a_matrix.n_rows);
 	int i;
 
 	for (i=a_matrix.offset; i<dim; i++){
@@ -287,13 +294,37 @@ struct matrix mul(struct matrix a_matrix, struct matrix b_matrix) {
 	return mult_matrix;
 }
 
-/*
+
 struct matrix matmul(struct matrix a_matrix, struct matrix b_matrix){
 	if (a_matrix.n_cols != b_matrix.n_rows){
 		printf("Impossível realizar a multiplicação. Insira uma quantidade de elementos válida.\n");
 		exit(1);
 	}
 
-	// desenvolver...
+	int dim = a_matrix.n_rows*b_matrix.n_cols;
+	int *matmult = malloc(dim * sizeof(int));
+
+
+	for (int i=0; i<dim; i++){
+		for (int j=0; j<a_matrix.n_rows; j++){
+			for (int k=0; k<b_matrix.stride_rows*b_matrix.n_cols; k+=b_matrix.stride_rows){
+				// (1, 0, 0) * (0 ,1, 2)
+				// (0, 1, 0)   (3, 4, 5)
+				// (0, 0, 1)   (6, 7, 8)
+
+				// (0*0 + 1*3 + 2*6 , 0*1 + 1*4 + 2*7, 0*2 + 1*5, 2*8)
+				// (3*0 + 4*3 + 5*6 , 3*1 + 4*4 + 5*7, 3*2 + 4*5, 5*8)
+				// (6*0 + 7*3 + 8*6 , 6*1 + 7*4 + 8*7, 6*2 + 7*5, 8*8)
+
+				//printf("%d \n", a_matrix.data[j*a_matrix.stride_rows + a]);
+				printf("i = %d, ", i);
+				printf("j = %d, ", j);
+				printf("k = %d, ", k);
+				printf("|\n");
+				//matmult[i] = (j*k + j+1*k + j+2*k+b_matrix.stride_rows);
+			}
+		}
+	}
+	return a_matrix;
+
 }
-*/

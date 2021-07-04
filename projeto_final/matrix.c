@@ -296,7 +296,7 @@ struct matrix mul(struct matrix a_matrix, struct matrix b_matrix) {
 
 
 struct matrix matmul(struct matrix a_matrix, struct matrix b_matrix){
-	if (a_matrix.n_cols != b_matrix.n_rows){
+	if (a_matrix.n_cols != b_matrix.n_rows) {
 		printf("Impossível realizar a multiplicação. Insira uma quantidade de elementos válida.\n");
 		exit(1);
 	}
@@ -304,27 +304,63 @@ struct matrix matmul(struct matrix a_matrix, struct matrix b_matrix){
 	int dim = a_matrix.n_rows*b_matrix.n_cols;
 	int *matmult = malloc(dim * sizeof(int));
 
+	// Transformo matmult num array de zeros para poder fazer operações sobre eles
+	for (int i=0; i<dim; i++){
+		matmult[i]= 0;
+	}
+
+	int p = 0;
+	int m = 0;
+
+	//printf("a_stride_rows: %d\n", a_matrix.stride_rows);
+	//printf("b_stride_rows: %d\n", b_matrix.stride_rows);
 
 	for (int i=0; i<dim; i++){
-		for (int j=0; j<a_matrix.n_rows; j++){
-			for (int k=0; k<b_matrix.stride_rows*b_matrix.n_cols; k+=b_matrix.stride_rows){
-				// (1, 0, 0) * (0 ,1, 2)
-				// (0, 1, 0)   (3, 4, 5)
-				// (0, 0, 1)   (6, 7, 8)
+		//for (int k=0; k<b_matrix.stride_rows*b_matrix.n_cols; k+=b_matrix.stride_rows){
+			int k = 0;
+
+			for (int j=0; j<a_matrix.n_cols; j++){
+				m = j;
+				m += a_matrix.stride_rows * (i / b_matrix.stride_rows);
+
+				if (i % b_matrix.stride_rows == 0){
+					p = 0;
+				}
+				// (0, 1, 2) * (0 ,1, 2)
+				// (3, 4, 5)   (3, 4, 5)
+				// (6, 7, 8)   (6, 7, 8)
 
 				// (0*0 + 1*3 + 2*6 , 0*1 + 1*4 + 2*7, 0*2 + 1*5, 2*8)
 				// (3*0 + 4*3 + 5*6 , 3*1 + 4*4 + 5*7, 3*2 + 4*5, 5*8)
 				// (6*0 + 7*3 + 8*6 , 6*1 + 7*4 + 8*7, 6*2 + 7*5, 8*8)
 
-				//printf("%d \n", a_matrix.data[j*a_matrix.stride_rows + a]);
-				printf("i = %d, ", i);
-				printf("j = %d, ", j);
-				printf("k = %d, ", k);
-				printf("|\n");
-				//matmult[i] = (j*k + j+1*k + j+2*k+b_matrix.stride_rows);
+				// (0, 1) * (0. 1)
+				// (2, 3)	(2, 3)
+
+				// (0*0 + 1*2, 0*1 + 1*3)
+				// (2*0 + 3*2, 2*1 + 3*3)
+
+				// (0, 1, 2) * (0, 1)
+				// (3, 4, 5)   (2, 3)
+				//			   (4, 5)
+
+				// (0*0 + 1*2 + 2*4, 0*1 + 1*3 + 2*5)
+				// (3*0 + 4*2 + 5*4, 3*1 + 4*3 + 5*5)
+
+				matmult[i] += a_matrix.data[m] * b_matrix.data[k+p];
+				
+				printf("%d * %d\n", a_matrix.data[m], b_matrix.data[k+p]);
+
+				k += b_matrix.stride_rows;
 			}
-		}
+			//printf("\n");
+			//printf("elemento: %d", matmult[i]); 
+			p++;
+			printf("\n");
+
 	}
-	return a_matrix;
+
+	struct matrix matmult_matrix = create_matrix(matmult, a_matrix.n_rows, b_matrix.n_cols);
+	return matmult_matrix;
 
 }

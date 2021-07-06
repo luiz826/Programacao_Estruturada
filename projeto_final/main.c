@@ -10,24 +10,50 @@
 #include "matrix.h"
 
 int main(void){
-	int data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	struct matrix a_matrix = create_matrix(data, 2, 5);
+	int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	struct matrix matrix_cm = create_matrix(data, 3, 3);
+	struct matrix matrix_z = zeros_matrix(5, 4);
+	struct matrix matrix_rand = random_matrix(4, 3, 1, 10);
+	struct matrix matrix_i = i_matrix(3);
+	
+	printf("matrix cm: \n");
+	print_matrix(matrix_cm);
+	printf("zeros matrix: \n");
+	print_matrix(matrix_z);
+	printf("random matrix: \n");
+	print_matrix(matrix_rand);
+	printf("identity matrix: \n");
+	print_matrix(matrix_i);
+	
+	printf("get element (0,1) of identity matrix: %d\n", get_element(matrix_i, 0, 1));
+	printf("put element 9 in (0,1) in identity matrix: \n");
+	put_element(matrix_i, 0, 1, 9);
+	print_matrix(matrix_i);
 
-	int data1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-	struct matrix b_matrix = create_matrix(data1, 5, 4);
-	//struct matrix an_i_matrix = i_matrix(3);
-
-
-	//print_matrix(an_i_matrix);
-	//printf("\n");
-	//print_matrix(a_matrix);
-	//printf("\n");
-	struct matrix c_matrix = matmul(a_matrix, b_matrix);
-	print_matrix(c_matrix);
-	//for (int i =0; i<9; i++){
-	//	printf("%d ", c_matrix.data[i]);
-	//}
-	//printf("\n");
+	printf("transpose random matrix: \n");
+	print_matrix(transpose(matrix_rand));
+	printf("reshape zeros matrix: \n");
+	print_matrix(reshape(matrix_z, 10, 2));
+	printf("flatten identity matrix: \n");
+	print_matrix(flatten(matrix_i));
+	printf("slice matrix cm\n");
+	print_matrix(slice(matrix_cm, 0, 1, 0, 3));
+	
+	printf("sum identity matrix: %d\n", sum(matrix_i));
+	printf("mean matrix cm: %f\n", mean(matrix_cm));
+	printf("min random matrix: %d\n", min(matrix_rand));
+	printf("max random matrix: %d\n", max(matrix_rand));
+	
+	printf("add identity matrix and matrix cm: \n");
+	print_matrix(add(matrix_i, matrix_cm));
+	printf("sub identity matrix and matrix cm: \n");
+	print_matrix(sub(matrix_cm, matrix_i));
+	printf("division identity matrix and matrix cm: \n");
+	print_matrix(division(matrix_i, matrix_cm));
+	printf("mul identity matrix and matrix cm: \n");
+	print_matrix(mul(matrix_i, matrix_cm));
+	printf("matmul identity matrix and matrix cm: \n");
+	print_matrix(matmul(matrix_i, matrix_cm));
 
 	return 0;
 }
